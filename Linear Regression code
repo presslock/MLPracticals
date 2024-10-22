@@ -1,0 +1,60 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+df = pd.read_csv("C:/Users/ADMIN/Documents/jupyter/c++ files/housing.csv")
+df
+df.isnull().sum()
+df.shape
+df.duplicated().sum()
+df=df.dropna()
+df.isnull().sum()
+df.info()
+df['ocean_proximity'].unique()
+ df['ocean_proximity'].map({'NEAR BAY': 1, '<1H OCEAN': 2, 'INLAND': 3, 'NEAR OCEAN' : 4, 'ISLAND': 5})
+df = df.copy()
+
+df.loc[:, 'ocean_proximity'] = df['ocean_proximity'].map({
+    'NEAR BAY': 1, 
+    '<1H OCEAN': 2, 
+    'INLAND': 3, 
+    'NEAR OCEAN': 4, 
+    'ISLAND': 5
+})
+
+df['ocean_proximity']
+df.head()
+df.hist(bins=50,figsize=(20,15))
+plt.show()
+
+x = sns.heatmap(df.corr(),annot=True)
+from sklearn.model_selection import train_test_split
+
+x = df.drop(columns = 'median_house_value')
+y = df['median_house_value']
+
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.fit_transform(x_test)
+
+x_train
+
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression()
+reg.fit(x_train,y_train)
+
+y_pred = reg.predict(x_test)
+y_pred
+
+from sklearn.metrics import accuracy_score
+train_score = reg.score(x_test,y_test)
+
+train_score
+
+test_score = reg.score(x_train,y_train)
+test_score*100
+
+y_pred = reg.predict(-122.23,37.88,41.0,880.0,129.0,322.0,126.0,8.3252,1)
+y_pred
