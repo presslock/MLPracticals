@@ -1,0 +1,52 @@
+# Import necessary libraries
+import pandas as pd
+import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import SpectralClustering
+from sklearn.metrics import silhouette_score
+from scipy.sparse import csr_matrix
+
+# Load Facebook dataset (edges list)
+url = 'https://snap.stanford.edu/data/facebook_combined.txt.gz'
+df = pd.read_csv(url, sep=' ', header=None, names=['node1', 'node2'])
+
+# Construct a graph
+G = nx.from_pandas_edgelist(df, 'node1', 'node2')
+
+# Visualize the graph (optional)
+plt.figure(figsize=(8, 8))
+nx.draw(G, node_size=50, node_color='blue', edge_color='gray', with_labels=False)
+plt.show()
+
+# Convert graph to adjacency matrix (sparse format)
+adj_matrix = nx.adjacency_matrix(G)
+
+# Ensure the matrix is in sparse format for Spectral Clustering
+adj_matrix = csr_matrix(adj_matrix)
+
+
+
+# Define the number of clusters
+n_clusters = 6  # Adjust as necessary
+
+# Apply Spectral Clustering
+sc = SpectralClustering(n_clusters=n_clusters, affinity='precomputed', assign_labels='kmeans')
+
+# Fit the model
+sc.fit(adj_matrix)
+
+# Predict cluster labels
+labels = sc.labels_
+
+# Visualize clustering (optional for Facebook dataset)
+pos = nx.spring_layout(G)
+plt.figure(figsize=(8, 8))
+nx.draw(G, pos, node_color=labels, node_size=50, cmap=plt.cm.rainbow, with_labels=False)
+plt.show()
+
+
+
+# Compute Silhouette Score
+silhouette_avg = silhouette_score(adj_matrix, labels, metric='precomputed')
+print(f'Silhouette Score: {silhouette_avg}')
